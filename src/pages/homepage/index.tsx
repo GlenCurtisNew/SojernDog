@@ -3,51 +3,121 @@ import to from 'await-to-js';
 import axios from 'axios';
 import styled from 'styled-components';
 import Dog from '../../components/Dog';
-
-const dogsToDisplay = 6;
+import { dogTypes } from '../../types';
+import { IoReload } from 'react-icons/io5';
+import { DOGS_TO_DISPLAY } from '../../constants';
+import { ClipLoader } from 'react-spinners';
 
 const Index = (): JSX.Element => {
-    const [dogs, setDogs] = useState<Array<{ hostname: string; key: string; fileType: string }>>([]);
-    const [loadMore, setLoadMore] = useState(false);
+    const [dogs, setDogs] = useState<Array<dogTypes>>([]);
+    const [loading, setLoading] = useState(false);
+
+    const refresh = () => {
+        setDogs([]);
+    };
 
     useEffect(() => {
-        let loop = 0;
-        const fetchDog = async () => {
+        const fetchDog = async (): Promise<dogTypes> => {
             const [err, result] = await to(axios.get('https://random.dog/woof.json'));
             if (err) {
-                console.error('Issue with fetching endpoints');
+                throw new Error(`Issue with api call: ${err}`);
             }
             const { url: urlString } = result?.data;
             const { hostname, pathname } = new URL(urlString);
             const [path, fileType] = pathname.split('.');
-            const key = path.substring(1);
-            setDogs((old) => [...old, { hostname, key, fileType }]);
+            const keyString = path.substring(1);
+            return { hostname, keyString, fileType };
         };
-        while (loop < dogsToDisplay) {
-            fetchDog();
-            loop++;
+        if (dogs.length < DOGS_TO_DISPLAY) {
+            if (dogs.length <= 0) {
+                setLoading(true);
+            }
+            fetchDog()
+                .then((res) => {
+                    // Stop loading as soon as one dog is added to array. The rest will load async
+                    if (dogs.length > 0) {
+                        setLoading(false);
+                    }
+                    setDogs((old) => [...old, res]);
+                })
+                .catch((err) => console.log(err));
         }
-    }, []);
+    }, [dogs]);
 
-    console.log(dogs);
+    if (loading) {
+        return (
+            <LoadingContainer>
+                <ClipLoader color={'white'} loading={loading} size={150} />
+            </LoadingContainer>
+        );
+    }
 
     return (
-        <div className="App">
-            <button>Next</button>
+        <>
+            <RefreshContainer>
+                <ClickableContainer onClick={refresh}>
+                    <p>Refresh</p>
+                    <StyledRefresh />
+                </ClickableContainer>
+            </RefreshContainer>
             <DogsContainer>
                 {dogs.map((dog) => (
-                    <Dog key={dog.key} hostname={dog.hostname} keyString={dog.key} fileType={dog.fileType} />
+                    <Dog
+                        key={dog.keyString}
+                        hostname={dog.hostname}
+                        keyString={dog.keyString}
+                        fileType={dog.fileType}
+                    />
                 ))}
             </DogsContainer>
-        </div>
+        </>
     );
 };
 
+const RefreshContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+`;
+
+const ClickableContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    p {
+        margin-right: 0.5em;
+    }
+    :hover {
+        svg {
+            color: yellow;
+        }
+        color: yellow;
+    }
+`;
+
 const DogsContainer = styled.div`
     display: flex;
-    height: 200px;
+    height: 150px;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
+`;
+
+const StyledRefresh = styled(IoReload)`
+    color: white;
+    width: 2em;
+    height: 2em;
+    margin: 1em 0;
+`;
+
+const LoadingContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
 `;
 
 export default Index;
