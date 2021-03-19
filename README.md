@@ -1,4 +1,4 @@
-### Hosted Site
+### Hosted Site (Hover the dog images and click to favorite)
 http://sojern-dog.s3-website-eu-west-1.amazonaws.com/
 
 ### Installing & Running Locally
