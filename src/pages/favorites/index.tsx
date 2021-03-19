@@ -4,6 +4,22 @@ import styled from 'styled-components';
 import { FaHeartBroken } from 'react-icons/all';
 import Dog from '../../components/Dog';
 
+/**
+ * Favorites objects in memory (localStorage) will look like this
+ * {
+ *     "aaa-bbb-ccc-ddd": {
+ *          fileType: "jpg",
+ *          hostname: "random.dog",
+ *          keyString: "bbb-ccc-ddd-aaa"
+ *     },
+ *     "bbb-ccc-ddd-aaa": {
+ *          fileType: "gif",
+ *          hostname: "random.dog",
+ *          keyString: "ccc-aaa-bbb-aaa"
+ *     }
+ * }
+ */
+
 const Index = (): JSX.Element => {
     const [favorites, setFavorites] = useState(parseFavorites());
     if (isEmpty(favorites)) {
