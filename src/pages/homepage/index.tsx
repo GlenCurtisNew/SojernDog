@@ -22,6 +22,18 @@ const Index = (): JSX.Element => {
             if (err) {
                 throw new Error(`Issue with api call: ${err}`);
             }
+            /**
+             * We expect API to return this format
+             * {
+             *     "fileSize": 123,
+             *     "url": "https://random.org/aaa-bbb-ccc-ddd.png
+             * }
+             * In the next block we do some parsing
+             * - Extract the url key
+             * - Create a URL object and get the hostname and pathname key https://developer.mozilla.org/en-US/docs/Web/API/URL
+             * - Split the string on the period, { path = "/aaa-bbb-ccc-ddd", fileType = "png" }
+             * - Remove the "/" from the path string and store in keyString
+             */
             const { url: urlString } = result?.data;
             const { hostname, pathname } = new URL(urlString);
             const [path, fileType] = pathname.split('.');
