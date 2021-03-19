@@ -18,6 +18,6 @@ http://sojern-dog.s3-website-eu-west-1.amazonaws.com/
 - Load the dogs in more smoothly on the homepage (Add default sizes to initial flexboxes)
 - Custom toast component that matches the style of the site
 - Updated colours and general UI/UX
-- There is a chance that you can get duplicates as we are not checking the hash against other hashes already in the array
+- There is a chance that you can get images on the homepage as we are not checking the hash against other hashes already in the array. Only had this happen once so didn't implement the solution due to time
 
 
